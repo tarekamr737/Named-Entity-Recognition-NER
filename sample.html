@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EntityLens Workbench | Glassmorphism Edition</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #000000;
+            color: #e2e2e2;
+            overflow-x: hidden;
+        }
+        
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-panel-active {
+            background: rgba(30, 30, 30, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(0, 219, 233, 0.3);
+        }
+
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(0, 219, 233, 0.15);
+        }
+
+        .entity-chip {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border-width: 1px;
+            backdrop-filter: blur(4px);
+        }
+
+        .per { background: rgba(0, 219, 233, 0.1); border-color: rgba(0, 219, 233, 0.4); color: #7df4ff; }
+        .org { background: rgba(209, 188, 255, 0.1); border-color: rgba(209, 188, 255, 0.4); color: #d1bcff; }
+        .loc { background: rgba(0, 240, 255, 0.05); border-color: rgba(0, 240, 255, 0.3); color: #dbfcff; }
+        .misc { background: rgba(255, 177, 195, 0.1); border-color: rgba(255, 177, 195, 0.4); color: #ffb1c3; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        
+        .hud-margin {
+            margin: 16px;
+        }
+        @media (min-width: 768px) {
+            .hud-margin { margin: 40px; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ffb4ab",
+                      "surface-container": "#1f1f1f",
+                      "secondary": "#d1bcff",
+                      "surface-bright": "#393939",
+                      "on-tertiary-fixed-variant": "#8f0041",
+                      "tertiary": "#fff3f4",
+                      "primary-fixed": "#7df4ff",
+                      "outline": "#849495",
+                      "outline-variant": "#3b494b",
+                      "primary": "#dbfcff",
+                      "background": "#131313",
+                      "on-error": "#690005",
+                      "on-tertiary-fixed": "#3f0019",
+                      "inverse-surface": "#e2e2e2",
+                      "on-error-container": "#ffdad6",
+                      "surface-variant": "#353535",
+                      "on-background": "#e2e2e2",
+                      "on-secondary-fixed": "#23005b",
+                      "inverse-on-surface": "#303030",
+                      "on-primary-fixed": "#002022",
+                      "on-primary-container": "#006970",
+                      "on-primary-fixed-variant": "#004f54",
+                      "on-secondary-container": "#ddcdff",
+                      "secondary-container": "#7000ff",
+                      "surface-container-low": "#1b1b1b",
+                      "on-tertiary": "#66002c",
+                      "tertiary-container": "#ffccd6",
+                      "primary-container": "#00f0ff",
+                      "surface-container-high": "#2a2a2a",
+                      "secondary-fixed": "#e9ddff",
+                      "on-surface": "#e2e2e2",
+                      "surface": "#131313",
+                      "on-secondary": "#3c0090",
+                      "on-tertiary-container": "#bb0058",
+                      "error-container": "#93000a",
+                      "tertiary-fixed-dim": "#ffb1c3",
+                      "secondary-fixed-dim": "#d1bcff",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-secondary-fixed-variant": "#5700c9",
+                      "primary-fixed-dim": "#00dbe9",
+                      "on-primary": "#00363a",
+                      "surface-dim": "#131313",
+                      "on-surface-variant": "#b9cacb",
+                      "inverse-primary": "#006970",
+                      "tertiary-fixed": "#ffd9e0",
+                      "surface-tint": "#00dbe9",
+                      "surface-container-highest": "#353535"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "container-max": "1440px",
+                      "gutter": "24px",
+                      "margin-desktop": "40px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Geist"],
+                      "headline-lg": ["Geist"],
+                      "label-md": ["JetBrains Mono"],
+                      "body-md": ["Geist"],
+                      "body-lg": ["Geist"],
+                      "label-sm": ["JetBrains Mono"]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="font-body-md text-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- Ambient Background Lighting -->
+<div class="fixed inset-0 pointer-events-none z-0">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-fixed-dim/5 blur-[120px]"></div>
+<div class="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] rounded-full bg-secondary-container/5 blur-[100px]"></div>
+</div>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 bg-surface-container/60 backdrop-blur-xl border-b border-white/10 shadow-[0_0_20px_rgba(0,219,233,0.1)]">
+<div class="flex items-center gap-8">
+<div class="font-headline-md text-headline-md font-bold text-primary-fixed tracking-tight cursor-pointer">EntityLens.Workbench</div>
+<nav class="hidden md:flex gap-6 items-center h-full">
+<a class="font-body-md text-body-md text-primary-fixed border-b-2 border-primary-fixed pb-1 hover:text-primary transition-colors duration-200" href="#">Models</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Datasets</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Benchmarks</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 mr-4">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant">help</span>
+<span class="material-symbols-outlined text-on-surface-variant relative">
+                    notifications
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-primary-fixed-dim rounded-full"></span>
+</span>
+</div>
+<button class="bg-primary-fixed-dim text-on-primary-fixed font-bold px-4 py-2 rounded active:scale-95 transition-transform">Deploy Model</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/20">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female data scientist in a modern dark studio, subtle blue rim lighting reflecting on her glasses, ultra-detailed portrait photography, technical aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFGdJUcofSRiwloX6w2xZf2GMxPRln-CsLAx4coLROHZPWMhhZ9WK7dCajMOVSWFxmRA9S5OghuQCa8tdVi0N0WEcZrACg2-WIb-SW5d_qKj9p4ARUGZHngXqNHJEAllnZ9j95hrLRYNub6i-pStwu0emCjDOM1H3P2Ex0fgo-1j1Rv1JcxCiGgJX4uB_IhJxEoH9kjhcqDW7yqaTbTzboOhZrYR4AMhzRLb0xwa4WPir_a_Q2MS8"/>
+</div>
+</div>
+</header>
+<!-- Sidebar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 w-64 flex flex-col py-6 bg-surface-container-low/40 backdrop-blur-md border-r border-white/5">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5">
+<div class="w-10 h-10 rounded bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-fixed" style="font-variation-settings: 'FILL' 1;">schema</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-primary">Transformer-V4</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-wider">Active / GPU-01</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<div class="bg-primary-container/20 text-primary-fixed border-r-2 border-primary-fixed flex items-center gap-3 px-3 py-2.5 transition-all duration-300">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">schema</span>
+<span class="font-label-md text-label-md">Architecture</span>
+</div>
+<div class="text-on-surface-variant hover:bg-white/5 hover:text-on-surface flex items-center gap-3 px-3 py-2.5 transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined">science</span>
+<span class="font-label-md text-label-md">Weights</span>
+</div>
+<div class="text-on-surface-variant hover:bg-white/5 hover:text-on-surface flex items-center gap-3 px-3 py-2.5 transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined">segment</span>
+<span class="font-label-md text-label-md">Tokenizer</span>
+</div>
+<div class="text-on-surface-variant hover:bg-white/5 hover:text-on-surface flex items-center gap-3 px-3 py-2.5 transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined">book</span>
+<span class="font-label-md text-label-md">Dictionary</span>
+</div>
+<div class="text-on-surface-variant hover:bg-white/5 hover:text-on-surface flex items-center gap-3 px-3 py-2.5 transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-label-md text-label-md">Logs</span>
+</div>
+</nav>
+<div class="px-4 mt-auto space-y-4">
+<button class="w-full py-2 border border-primary-fixed/30 text-primary-fixed font-label-md text-label-md hover:bg-primary-fixed/10 transition-colors">
+                New Experiment
+            </button>
+<div class="pt-4 border-t border-white/5 space-y-1">
+<div class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-3 py-2 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</div>
+<div class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-3 py-2 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">description</span>
+<span class="font-label-md text-label-md">Docs</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-16 p-8 min-h-screen">
+<div class="max-w-[1400px] mx-auto space-y-8">
+<!-- Metric HUD Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="glass-panel p-5 rounded-xl group hover:border-primary-fixed/40 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-widest">System Load</span>
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm">memory</span>
+</div>
+<div class="text-3xl font-bold text-on-surface">42.8<span class="text-lg font-normal text-on-surface-variant ml-1">%</span></div>
+<div class="mt-2 w-full h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed-dim w-[42.8%] shadow-[0_0_8px_rgba(125,244,255,0.5)]"></div>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-xl group hover:border-primary-fixed/40 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-widest">Throughput</span>
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm">speed</span>
+</div>
+<div class="text-3xl font-bold text-on-surface">1.2k<span class="text-lg font-normal text-on-surface-variant ml-1">tps</span></div>
+<div class="flex items-center gap-1 mt-2 text-xs text-primary-fixed">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+<span>+12.4% vs last hour</span>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-xl group hover:border-primary-fixed/40 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-widest">F1 Accuracy</span>
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm">target</span>
+</div>
+<div class="text-3xl font-bold text-on-surface">94.2<span class="text-lg font-normal text-on-surface-variant ml-1">%</span></div>
+<div class="mt-2 text-xs text-on-surface-variant">Model: Transformer-V4 (Stable)</div>
+</div>
+<div class="glass-panel p-5 rounded-xl group hover:border-primary-fixed/40 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-widest">Latency</span>
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm">timer</span>
+</div>
+<div class="text-3xl font-bold text-on-surface">18<span class="text-lg font-normal text-on-surface-variant ml-1">ms</span></div>
+<div class="mt-2 w-full h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container w-[18%]"></div>
+</div>
+</div>
+</div>
+<!-- Bento Layout Work Area -->
+<div class="grid grid-cols-12 gap-6 items-start">
+<!-- Input Buffer (Col 1-7) -->
+<section class="col-span-12 lg:col-span-7 glass-panel rounded-2xl overflow-hidden flex flex-col h-[520px]">
+<div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed text-sm">edit_note</span>
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest">Text Input Buffer</span>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-[10px] uppercase font-bold border border-white/10 rounded hover:bg-white/5">Example 01</button>
+<button class="px-3 py-1 text-[10px] uppercase font-bold border border-white/10 rounded hover:bg-white/5">Example 02</button>
+</div>
+</div>
+<div class="flex-1 relative">
+<textarea class="w-full h-full bg-transparent border-none focus:ring-0 p-6 font-body-lg text-body-lg text-on-surface resize-none placeholder:text-on-surface-variant/30 custom-scrollbar" placeholder="Enter raw text here for NER analysis...">The executive board of Microsoft met in Seattle yesterday to discuss the acquisition of a new data center site in Zurich. Satya Nadella mentioned that the project, codenamed 'BlueSky', will focus on European market growth through 2025.</textarea>
+</div>
+<div class="px-6 py-4 border-t border-white/5 flex justify-between items-center bg-black/40">
+<div class="text-[11px] text-on-surface-variant/60 font-label-md">248 Characters | 42 Tokens</div>
+<div class="flex gap-4">
+<button class="text-on-surface-variant hover:text-white transition-colors text-sm font-bold">Clear</button>
+<button class="bg-primary-fixed-dim text-on-primary-fixed px-6 py-2 rounded font-bold shadow-[0_0_15px_rgba(125,244,255,0.3)] hover:shadow-[0_0_25px_rgba(125,244,255,0.5)] transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">analytics</span>
+                                Analyze Entities
+                            </button>
+</div>
+</div>
+</section>
+<!-- Legend & Highlights (Col 8-12) -->
+<section class="col-span-12 lg:col-span-5 glass-panel rounded-2xl h-[520px] flex flex-col overflow-hidden">
+<div class="px-6 py-4 border-b border-white/5 bg-white/2">
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest">Entity Recognition Legend</span>
+</div>
+<div class="p-6 flex-1 space-y-6">
+<div class="grid grid-cols-2 gap-3">
+<div class="p-3 rounded-lg border border-primary-fixed/20 bg-primary-fixed/5 flex flex-col gap-1">
+<span class="entity-chip per w-fit">PER</span>
+<span class="text-xs text-on-surface-variant">Person names</span>
+</div>
+<div class="p-3 rounded-lg border border-secondary/20 bg-secondary/5 flex flex-col gap-1">
+<span class="entity-chip org w-fit">ORG</span>
+<span class="text-xs text-on-surface-variant">Organizations</span>
+</div>
+<div class="p-3 rounded-lg border border-primary/20 bg-primary/5 flex flex-col gap-1">
+<span class="entity-chip loc w-fit">LOC</span>
+<span class="text-xs text-on-surface-variant">Locations</span>
+</div>
+<div class="p-3 rounded-lg border border-tertiary-fixed-dim/20 bg-tertiary-fixed-dim/5 flex flex-col gap-1">
+<span class="entity-chip misc w-fit">MISC</span>
+<span class="text-xs text-on-surface-variant">Miscellaneous</span>
+</div>
+</div>
+<div class="pt-6 border-t border-white/5">
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-4 tracking-widest">Model Confidence Distribution</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<div class="flex justify-between text-xs">
+<span>High Confidence (&gt;0.90)</span>
+<span class="text-primary-fixed">72%</span>
+</div>
+<div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed w-[72%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs">
+<span>Median (0.75 - 0.90)</span>
+<span class="text-on-surface">22%</span>
+</div>
+<div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-white/20 w-[22%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs">
+<span>Uncertain (&lt; 0.75)</span>
+<span class="text-error">6%</span>
+</div>
+<div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-error/50 w-[6%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Visualization Canvas & Entity Table (Full Width) -->
+<section class="col-span-12 glass-panel rounded-2xl overflow-hidden min-h-[400px]">
+<div class="px-6 py-4 border-b border-white/5 bg-white/2 flex items-center gap-4">
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest">Analysis Result</span>
+<div class="h-4 w-[1px] bg-white/20"></div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-primary-fixed/10 text-primary-fixed text-[10px] rounded">CRF LAYER ACTIVE</span>
+<span class="px-2 py-0.5 bg-secondary/10 text-secondary text-[10px] rounded">IOB SCHEME</span>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2">
+<!-- Highlighted Preview -->
+<div class="p-8 border-r border-white/5 min-h-[300px]">
+<h4 class="text-on-surface-variant font-label-sm text-label-sm uppercase mb-6 tracking-widest">Interactive Visualization</h4>
+<div class="text-body-lg leading-loose space-y-4">
+<p>
+                                    The executive board of <span class="entity-chip org">Microsoft <span class="text-[9px] opacity-60 ml-1">0.99</span></span> met in <span class="entity-chip loc">Seattle <span class="text-[9px] opacity-60 ml-1">0.98</span></span> yesterday to discuss the acquisition of a new data center site in <span class="entity-chip loc">Zurich <span class="text-[9px] opacity-60 ml-1">0.96</span></span>. 
+                                    <span class="entity-chip per">Satya Nadella <span class="text-[9px] opacity-60 ml-1">0.99</span></span> mentioned that the project, codenamed <span class="entity-chip misc">BlueSky <span class="text-[9px] opacity-60 ml-1">0.84</span></span>, will focus on European market growth through 2025.
+                                </p>
+</div>
+</div>
+<!-- Result Table -->
+<div class="p-0 flex flex-col h-full bg-black/20">
+<table class="w-full text-left border-collapse">
+<thead class="bg-white/5 border-b border-white/10">
+<tr>
+<th class="px-6 py-3 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Entity</th>
+<th class="px-6 py-3 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Type</th>
+<th class="px-6 py-3 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant text-right">Confidence</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-label-md text-on-surface">Microsoft</td>
+<td class="px-6 py-4"><span class="entity-chip org">ORG</span></td>
+<td class="px-6 py-4 text-right font-label-md text-primary-fixed">99.2%</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-label-md text-on-surface">Seattle</td>
+<td class="px-6 py-4"><span class="entity-chip loc">LOC</span></td>
+<td class="px-6 py-4 text-right font-label-md text-primary-fixed">98.5%</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-label-md text-on-surface">Zurich</td>
+<td class="px-6 py-4"><span class="entity-chip loc">LOC</span></td>
+<td class="px-6 py-4 text-right font-label-md text-primary-fixed">96.8%</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-label-md text-on-surface">Satya Nadella</td>
+<td class="px-6 py-4"><span class="entity-chip per">PER</span></td>
+<td class="px-6 py-4 text-right font-label-md text-primary-fixed">99.1%</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-label-md text-on-surface">BlueSky</td>
+<td class="px-6 py-4"><span class="entity-chip misc">MISC</span></td>
+<td class="px-6 py-4 text-right font-label-md text-secondary">84.2%</td>
+</tr>
+</tbody>
+</table>
+<div class="mt-auto p-4 flex justify-center border-t border-white/5">
+<button class="text-xs text-on-surface-variant hover:text-primary-fixed flex items-center gap-1 transition-colors">
+                                    Show 4 more entities
+                                    <span class="material-symbols-outlined text-[14px]">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Background Decoration -->
+<div class="fixed bottom-10 right-10 z-0 opacity-20 pointer-events-none">
+<div class="w-64 h-64 border border-white/5 rounded-full animate-pulse"></div>
+</div>
+<!-- Floating Action Feedback (Simulation) -->
+<div class="fixed bottom-8 right-8 glass-panel-active rounded-lg px-6 py-3 flex items-center gap-3 transform translate-y-20 transition-transform duration-500 z-[100]" id="status-toast">
+<div class="w-2 h-2 rounded-full bg-primary-fixed-dim animate-ping"></div>
+<span class="font-label-md text-label-md text-primary-fixed">Inference Complete (18ms)</span>
+</div>
+<script>
+        // Simple micro-interaction for the "Analyze" button
+        document.querySelector('button.bg-primary-fixed-dim').addEventListener('click', function() {
+            const toast = document.getElementById('status-toast');
+            toast.classList.remove('translate-y-20');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20');
+            }, 3000);
+        });
+
+        // Add visual reaction to text area
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('focus', () => {
+            textarea.closest('section').classList.add('border-primary-fixed/30');
+            textarea.closest('section').style.boxShadow = '0 0 40px rgba(0, 219, 233, 0.05)';
+        });
+        textarea.addEventListener('blur', () => {
+            textarea.closest('section').classList.remove('border-primary-fixed/30');
+            textarea.closest('section').style.boxShadow = 'none';
+        });
+    </script>
+</body></html>

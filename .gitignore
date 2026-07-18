@@ -1,0 +1,38 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.hypothesis/
+.DS_Store
+Thumbs.db
+
+# Local configuration and packaging output
+.env
+.env.*
+!.env.example
+*.egg-info/
+dist/
+build/
+
+# Local data and generated model artifacts
+data/raw/
+data/processed/
+data/embeddings/
+artifacts/checkpoints/
+artifacts/metrics/
+artifacts/plots/
+artifacts/screenshots/
+artifacts/vocabularies/
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# Streamlit and editor state
+.streamlit/secrets.toml
+.vscode/
+.idea/

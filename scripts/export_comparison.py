@@ -17,7 +17,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--train-samples", type=int, required=True)
     parser.add_argument("--validation-samples", type=int, required=True)
-    parser.add_argument("--epochs", type=float, required=True)
+    parser.add_argument(
+        "--note",
+        default="Training artifacts are compared on the supplied validation split.",
+    )
     return parser.parse_args()
 
 
@@ -41,6 +44,7 @@ def read_row(checkpoints: Path, architecture: str) -> dict[str, Any]:
             "runtime_seconds": metadata["training"]["train_runtime"],
             "parameter_count": metadata["parameter_count"],
             "model_size_megabytes": checkpoint_size_megabytes(checkpoint),
+            "epochs": metadata["training"]["epoch"],
         }
     return {
         "architecture": architecture,
@@ -50,6 +54,7 @@ def read_row(checkpoints: Path, architecture: str) -> dict[str, Any]:
         "runtime_seconds": metadata["runtime_seconds"],
         "parameter_count": metadata["parameter_count"],
         "model_size_megabytes": metadata["model_size_megabytes"],
+        "epochs": metadata["history"][-1]["epoch"],
     }
 
 
@@ -63,9 +68,11 @@ def main() -> None:
         "benchmark": {
             "train_samples": args.train_samples,
             "validation_samples": args.validation_samples,
-            "epochs": args.epochs,
+            "evaluation_split": "validation",
+            "test_split_used_for_training": False,
+            "training_epochs": {row["architecture"]: row["epochs"] for row in rows},
             "seed": 42,
-            "note": "Compact smoke benchmark. Do not use as a deployment-quality evaluation.",
+            "note": args.note,
         },
         "recommended_architecture": best["architecture"],
         "rows": rows,

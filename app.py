@@ -214,7 +214,7 @@ st.markdown(
 metrics = st.columns(4, gap="medium")
 metric_values = [
     ("Active model", architecture.replace("_", " ").title(), "Local checkpoint"),
-    ("Validation F1", f"{f1:.1%}", "Compact training run"),
+    ("Validation F1", f"{f1:.1%}", "Full training split"),
     ("Parameters", f"{parameter_count / 1_000_000:.1f}M" if parameter_count else "n/a", "Saved artifact metadata"),
     ("Inference", f"{st.session_state.result.elapsed_ms:.0f} ms" if st.session_state.result else "Awaiting run", "Local CPU estimate"),
 ]
@@ -300,23 +300,26 @@ with st.expander("Benchmark and boundary review", expanded=False):
     comparison = get_metric_artifact("model_comparison.json")
     boundaries = get_metric_artifact("boundary_analysis.json")
     if comparison:
+        benchmark = comparison["benchmark"]
         st.caption(
-            "Compact 64/32, one-epoch benchmark. Use it to compare workflow behavior, not "
-            "deployment quality."
+            f"Full training split: {benchmark['train_samples']:,} sentences. "
+            f"Validation split: {benchmark['validation_samples']:,} sentences. "
+            "The held-out test split was not used for training."
         )
         comparison_rows = pd.DataFrame(comparison["rows"])[
-            ["architecture", "validation_f1", "runtime_seconds", "model_size_megabytes"]
+            ["architecture", "validation_f1", "runtime_seconds", "model_size_megabytes", "epochs"]
         ].rename(
             columns={
                 "architecture": "Model",
                 "validation_f1": "Validation F1",
                 "runtime_seconds": "Runtime (s)",
                 "model_size_megabytes": "Size (MB)",
+                "epochs": "Epochs",
             }
         )
         st.dataframe(comparison_rows, width="stretch", hide_index=True)
         st.info(
-            f"Recommended in this compact benchmark: "
+            f"Recommended by validation F1: "
             f"{comparison['recommended_architecture'].replace('_', ' ').title()}."
         )
     else:
@@ -374,7 +377,7 @@ with st.expander("Benchmark and boundary review", expanded=False):
         st.caption("Run `scripts/analyze_boundaries.py` to add boundary diagnostics here.")
 
 st.markdown(
-    '<div class="notice">CoNLL-2003 labels: PER, ORG, LOC, MISC. The stored checkpoints are compact training artifacts, not production-grade models. '
+    '<div class="notice">CoNLL-2003 labels: PER, ORG, LOC, MISC. The stored checkpoints were trained on the full official training split; validate on the held-out test split before production use. '
     'Entered text is processed locally for inference and is not persisted by this application.</div>',
     unsafe_allow_html=True,
 )

@@ -1,5 +1,10 @@
 # EntityLens
 
+<img width="1920" height="1080" alt="Screenshot 2026-07-19 165650" src="https://github.com/user-attachments/assets/355bf4fe-6b45-43e9-bb79-d39cb2e1bbcc" />
+
+<img width="1920" height="1080" alt="Screenshot 2026-07-19 165710" src="https://github.com/user-attachments/assets/b70d8708-252a-44e8-a461-9aa0beac2a20" />
+
+
 EntityLens is a reproducible Named Entity Recognition (NER) workbench for the
 CoNLL-2003 dataset. It provides a common data and evaluation pipeline for
 comparing sequence models with a transformer baseline, then exposes their

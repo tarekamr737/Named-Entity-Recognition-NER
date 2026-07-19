@@ -155,10 +155,6 @@ Downloaded datasets, model checkpoints, embeddings, caches, and generated
 reports are excluded from version control. Recreate them with the commands above
 after cloning the repository.
 
-## DEMO
-
-https://ner-named-entity-recognition.streamlit.app/
-
 ## License
 
 EntityLens is released under the [MIT License](LICENSE).
